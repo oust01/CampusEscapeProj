@@ -75,19 +75,28 @@ public class UI {
         this.g2 = g2;
 
         // ===== START GAME HINT =====
+     // ===== START GAME HINT =====
         if (gp.gameState == gp.playState && showStartHint) {
-            drawHintBox(
-                "Press E to talk to the guard",
-                gp.screenWidth / 2 - gp.tileSize * 3,
-                gp.screenHeight - gp.tileSize * 3,
-                gp.tileSize * 6,
-                gp.tileSize + 10
-            );
 
-            // Hide hint after ~4 seconds (240 frames @60fps)
+            String hintText =
+                    "E to talk to the guard\n" +
+                    "\nCONTROLS:W A S D\n"+
+                    "\nP = Pause/Play";
+            		
+
+            drawHintBox(
+            	    hintText,
+            	    gp.screenWidth / 2 - gp.tileSize * 4,
+            	    gp.screenHeight - gp.tileSize * 4,
+            	    gp.tileSize * 8,
+            	    gp.tileSize * 3
+            	);
+
+
             startHintCounter++;
-            if (startHintCounter > 240) showStartHint = false;
+            if (startHintCounter > 60) showStartHint = false; // 60 = 1secs
         }
+
 
         // ===== TITLE SCREEN =====
         if (gp.gameState == gp.titleState) {
@@ -321,10 +330,21 @@ public class UI {
         g2.setFont(new Font("Arial", Font.PLAIN, 22));
         FontMetrics fm = g2.getFontMetrics();
 
-        g2.drawString(
-                text,
-                x + (w - fm.stringWidth(text)) / 2,
-                y + (h + fm.getAscent()) / 2 - 4
-        );
+        String[] lines = text.split("\n");
+        int lineHeight = fm.getHeight();
+        int totalHeight = lines.length * lineHeight;
+
+        int startY = y + (h - totalHeight) / 2 + fm.getAscent();
+
+        for (int i = 0; i < lines.length; i++) {
+            int textX = x + (w - fm.stringWidth(lines[i])) / 2;
+            int textY = startY + i * lineHeight;
+            g2.drawString(lines[i], textX, textY);
+        }
+
+                
+                
+                
+       
     }
 }

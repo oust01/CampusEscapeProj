@@ -15,6 +15,9 @@ public class Player extends Entity {
     public final int screenY;
     public int hasKey = 0;
 
+    // ===== TALK RANGE (adjust if needed) =====
+    private static final int TALK_RANGE = 180; // pixels (~1.3 tiles)
+
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
         this.keyH = keyH;
@@ -52,36 +55,26 @@ public class Player extends Entity {
         right2 = setup("/player/man_right_2");
     }
 
-    
-
+    @Override
     public void update() {
 
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+        // ===== MOVEMENT =====
+        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
 
-            // SET DIRECTION
-            if(keyH.upPressed) direction = "up";
-            else if(keyH.downPressed) direction = "down";
-            else if(keyH.leftPressed) direction = "left";
-            else if(keyH.rightPressed) direction = "right";
+            if (keyH.upPressed) direction = "up";
+            else if (keyH.downPressed) direction = "down";
+            else if (keyH.leftPressed) direction = "left";
+            else if (keyH.rightPressed) direction = "right";
 
-            // RESET COLLISION
             collisionOn = false;
 
-            // TILE COLLISION
             gp.cChecker.checkTile(this);
 
-            // OBJECT COLLISION
             int objIndex = gp.cChecker.checkObject(this, true);
             pickUpObject(objIndex);
 
-            // NPC COLLISION
-            int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-            interactNPC(npcIndex);
-
-                   
-            // MOVE ONLY IF NO COLLISION
-            if(!collisionOn) {
-                switch(direction) {
+            if (!collisionOn) {
+                switch (direction) {
                     case "up": worldY -= speed; break;
                     case "down": worldY += speed; break;
                     case "left": worldX -= speed; break;
@@ -89,21 +82,38 @@ public class Player extends Entity {
                 }
             }
 
-            // ANIMATION
             spriteCounter++;
-            if(spriteCounter > 12) {
+            if (spriteCounter > 12) {
                 spriteNum = (spriteNum == 1 ? 2 : 1);
                 spriteCounter = 0;
             }
         }
-        
-        
-        
+
+        // ===== TALK WHEN NEAR NPC (NO COLLISION) =====
+        if (keyH.ePressed) {
+            talkToNearbyNPC();
+            keyH.ePressed = false;
+        }
     }
 
+    // ===== PROXIMITY NPC INTERACTION =====
+    private void talkToNearbyNPC() {
 
-    
+        for (int i = 0; i < gp.npc.length; i++) {
 
+            if (gp.npc[i] == null) continue;
+
+            int dx = Math.abs(worldX - gp.npc[i].worldX);
+            int dy = Math.abs(worldY - gp.npc[i].worldY);
+
+            if (dx <= TALK_RANGE && dy <= TALK_RANGE) {
+                gp.npc[i].speak();
+                return; // talk to ONE NPC only
+            }
+        }
+    }
+
+    // ===== OBJECT PICKUP (UNCHANGED) =====
     public void pickUpObject(int i) {
 
         if (i == 999) return;
@@ -139,16 +149,11 @@ public class Player extends Entity {
 
             case "Chest":
                 gp.playSE(3);
-
                 int chestX = gp.obj[i].worldX;
                 int chestY = gp.obj[i].worldY;
-
-                gp.obj[i] = null;       // Remove chest
-
-                gp.obj[i] = new OBJ_Boots(gp); // Replace chest with boots
+                gp.obj[i] = new OBJ_Boots(gp);
                 gp.obj[i].worldX = chestX;
                 gp.obj[i].worldY = chestY;
-
                 gp.ui.showMessage("The chest contained Boots!");
                 break;
 
@@ -165,29 +170,16 @@ public class Player extends Entity {
                     gp.ui.showMessage("YOW! GIVE ME 5 KEYS AND I'LL LET YOU OUT;>");
                 }
                 break;
-              
 
-            case "DecoyKey":  // Handle the DecoyKey
-                gp.playSE(1);  // Play sound for pickup (optional)
-                // You can add any custom logic for the DecoyKey, such as:
-                // - Displaying a message
-                // - Triggering a special event, etc.
-                gp.obj[i] = null;  // Remove the DecoyKey from the world
-                gp.ui.showMessage("GET SCAMMED YOU GREEDY HUMAN (' A ')Ψ");  // Show message
-                
+            case "DecoyKey":
+                gp.playSE(1);
+                gp.obj[i] = null;
+                gp.ui.showMessage("GET SCAMMED YOU GREEDY HUMAN (' A ')Ψ");
                 break;
-                
-                
         }
     }
 
-    public void interactNPC(int i) {
-        if (i != 999 && keyH.ePressed) {
-            gp.npc[i].speak();
-            keyH.ePressed = false;
-        }
-    }
-
+    @Override
     public void draw(java.awt.Graphics2D g2) {
 
         BufferedImage image = null;
@@ -201,7 +193,4 @@ public class Player extends Entity {
 
         g2.drawImage(image, screenX, screenY, null);
     }
-    
-    
-    
 }
