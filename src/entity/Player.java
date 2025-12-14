@@ -15,6 +15,9 @@ public class Player extends Entity {
     public final int screenY;
     public int hasKey = 0;
 
+    // ===== HOW CLOSE YOU NEED TO TALK =====
+    private static final int TALK_RANGE = 64; // pixels
+
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
         this.keyH = keyH;
@@ -52,36 +55,26 @@ public class Player extends Entity {
         right2 = setup("/player/man_right_2");
     }
 
-    
-
+    @Override
     public void update() {
 
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+        // ===== MOVEMENT =====
+        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
 
-            // SET DIRECTION
-            if(keyH.upPressed) direction = "up";
-            else if(keyH.downPressed) direction = "down";
-            else if(keyH.leftPressed) direction = "left";
-            else if(keyH.rightPressed) direction = "right";
+            if (keyH.upPressed) direction = "up";
+            else if (keyH.downPressed) direction = "down";
+            else if (keyH.leftPressed) direction = "left";
+            else if (keyH.rightPressed) direction = "right";
 
-            // RESET COLLISION
             collisionOn = false;
 
-            // TILE COLLISION
             gp.cChecker.checkTile(this);
 
-            // OBJECT COLLISION
             int objIndex = gp.cChecker.checkObject(this, true);
             pickUpObject(objIndex);
 
-            // NPC COLLISION
-            int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-            interactNPC(npcIndex);
-
-                   
-            // MOVE ONLY IF NO COLLISION
-            if(!collisionOn) {
-                switch(direction) {
+            if (!collisionOn) {
+                switch (direction) {
                     case "up": worldY -= speed; break;
                     case "down": worldY += speed; break;
                     case "left": worldX -= speed; break;
@@ -89,21 +82,38 @@ public class Player extends Entity {
                 }
             }
 
-            // ANIMATION
             spriteCounter++;
-            if(spriteCounter > 12) {
-                spriteNum = (spriteNum == 1 ? 2 : 1);
+            if (spriteCounter > 12) {
+                spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
             }
         }
-        
-        
-        
+
+        // ===== TALK TO NPC WHEN NEAR (NO COLLISION) =====
+        if (keyH.ePressed) {
+            interactNearbyNPC();
+            keyH.ePressed = false;
+        }
     }
 
+    // ===== NEW PROXIMITY NPC INTERACTION =====
+    private void interactNearbyNPC() {
 
-    
+        for (int i = 0; i < gp.npc.length; i++) {
 
+            if (gp.npc[i] == null) continue;
+
+            int dx = Math.abs(worldX - gp.npc[i].worldX);
+            int dy = Math.abs(worldY - gp.npc[i].worldY);
+
+            if (dx <= TALK_RANGE && dy <= TALK_RANGE) {
+                gp.npc[i].speak();
+                return; // talk to only ONE NPC
+            }
+        }
+    }
+
+    // ===== OBJECT PICKUP (UNCHANGED) =====
     public void pickUpObject(int i) {
 
         if (i == 999) return;
@@ -119,89 +129,4 @@ public class Player extends Entity {
                 gp.ui.showMessage("YOU GOT A KEY! ;)");
                 break;
 
-            case "Door":
-                gp.playSE(4);
-                if (hasKey > 0) {
-                    gp.obj[i] = null;
-                    collisionOn = false;
-                    hasKey--;
-                    gp.ui.showMessage("AIGHT YOUR CHOICE....");
-                } else {
-                    gp.ui.showMessage("YOU SURE?");
-                }
-                break;
-
-            case "Boots":
-                gp.playSE(3);
-                speed += 6;
-                gp.obj[i] = null;
-                break;
-
-            case "Chest":
-                gp.playSE(3);
-
-                int chestX = gp.obj[i].worldX;
-                int chestY = gp.obj[i].worldY;
-
-                gp.obj[i] = null;       // Remove chest
-
-                gp.obj[i] = new OBJ_Boots(gp); // Replace chest with boots
-                gp.obj[i].worldX = chestX;
-                gp.obj[i].worldY = chestY;
-
-                gp.ui.showMessage("The chest contained Boots!");
-                break;
-
-            case "Steeldoor":
-                gp.playSE(4);
-                if (hasKey >= 5) {
-                    gp.obj[i] = null;
-                    collisionOn = false;
-                    gp.ui.gameFinished = true;
-                    gp.stopMusic();
-                    gp.playSE(2);
-                    gp.gameState = gp.gameOverState;
-                } else {
-                    gp.ui.showMessage("YOW! GIVE ME 5 KEYS AND I'LL LET YOU OUT;>");
-                }
-                break;
-              
-
-            case "DecoyKey":  // Handle the DecoyKey
-                gp.playSE(1);  // Play sound for pickup (optional)
-                // You can add any custom logic for the DecoyKey, such as:
-                // - Displaying a message
-                // - Triggering a special event, etc.
-                gp.obj[i] = null;  // Remove the DecoyKey from the world
-                gp.ui.showMessage("GET SCAMMED YOU GREEDY HUMAN (' A ')Ψ");  // Show message
-                
-                break;
-                
-                
-        }
-    }
-
-    public void interactNPC(int i) {
-        if (i != 999 && keyH.ePressed) {
-            gp.npc[i].speak();
-            keyH.ePressed = false;
-        }
-    }
-
-    public void draw(java.awt.Graphics2D g2) {
-
-        BufferedImage image = null;
-
-        switch (direction) {
-            case "up": image = (spriteNum == 1 ? up1 : up2); break;
-            case "down": image = (spriteNum == 1 ? down1 : down2); break;
-            case "left": image = (spriteNum == 1 ? left1 : left2); break;
-            case "right": image = (spriteNum == 1 ? right1 : right2); break;
-        }
-
-        g2.drawImage(image, screenX, screenY, null);
-    }
-    
-    
-    
-}
+            case "Door
