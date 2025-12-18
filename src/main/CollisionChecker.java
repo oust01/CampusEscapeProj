@@ -12,8 +12,29 @@ public class CollisionChecker {
 
     public CollisionChecker(GamePanel gp) {
         this.gp = gp;
+        
+    }
+    
+ // Check if player is near an entity (without moving)
+    public boolean checkPlayerNearby(Entity entity) {
+        Rectangle playerRect = new Rectangle(
+            gp.player.worldX + gp.player.solidArea.x,
+            gp.player.worldY + gp.player.solidArea.y,
+            gp.player.solidArea.width,
+            gp.player.solidArea.height
+        );
+
+        Rectangle entityRect = new Rectangle(
+            entity.worldX + entity.solidArea.x,
+            entity.worldY + entity.solidArea.y,
+            entity.solidArea.width,
+            entity.solidArea.height
+        );
+
+        return playerRect.intersects(entityRect);
     }
 
+    
     // ================= TILE COLLISION =================
     public void checkTile(Entity entity) {
 

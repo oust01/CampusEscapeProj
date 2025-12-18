@@ -115,6 +115,8 @@ public class TileManager {
 	        e.printStackTrace();
 	    }
 	}
+	
+	
 
 	//GOES THROUGH WALL OR NOT
 	public void getTileImage() {
@@ -147,7 +149,38 @@ public class TileManager {
 			
 		
 					
-	}	
+	}
+	
+	public void loadNewTileData(String dataPath, String mapPath) {
+	    // 1. Clear the old lists
+	    fileNames.clear();
+	    collisionStatus.clear();
+
+	    // 2. Read the NEW tile data file (e.g., datatile2.txt)
+	    try {
+	        InputStream is = getClass().getResourceAsStream(dataPath);
+	        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	        String line;
+	        while ((line = br.readLine()) != null) {
+	            if (line.trim().isEmpty()) continue;
+	            fileNames.add(line);
+	            collisionStatus.add(br.readLine());
+	        }
+	        br.close();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+
+	    // 3. Re-initialize the tile array with the new size
+	    tile = new Tile[fileNames.size()];
+	    getTileImage(); // This re-loads the actual images into the array
+
+	    // 4. Finally, load the map that uses these new IDs
+	    loadMap(mapPath);
+	}
+	
+	
+	
 	public void setup(int index, String imageName, boolean collision) {
 		
 		UtilityTool uTool = new UtilityTool();
@@ -201,39 +234,3 @@ public class TileManager {
 	}
 		
   }
-	
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

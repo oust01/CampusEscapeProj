@@ -3,6 +3,7 @@ package main;
 import entity.NPC_Guard;
 import entity.Monster;
 import entity.MonsterGirl;
+import entity.MonsterOrc;
 import object.*;
 
 public class AssetSetter {
@@ -75,7 +76,7 @@ public class AssetSetter {
     public void setNPC() {
 
         // GUARD (friendly / interactive)
-        gp.npc[0] = new NPC_Guard(gp);
+       /* gp.npc[0] = new NPC_Guard(gp);
         gp.npc[0].worldX = gp.tileSize * 63;
         gp.npc[0].worldY = gp.tileSize * 51;
 
@@ -118,10 +119,70 @@ public class AssetSetter {
         
         gp.npc[10] = new Monster(gp);
         gp.npc[10].worldX = gp.tileSize * 43;
-        gp.npc[10].worldY = gp.tileSize * 45;
+        gp.npc[10].worldY = gp.tileSize * 45; */
         
+    	
         
+    }
+    
+    
+    //map 2 monster
+
+    public void setMap2NPC() {
+        // Clear any leftover NPCs just in case
+        for(int i = 0; i < gp.npc.length; i++) {
+            gp.npc[i] = null;
+        }
+
+        gp.npc[0] = new MonsterOrc(gp);
+        gp.npc[0].worldX = gp.tileSize * 48; // Place him near the end or center
+        gp.npc[0].worldY = gp.tileSize * 30;
         
+        gp.npc[1] = new MonsterOrc(gp);
+        gp.npc[1].worldX = gp.tileSize * 48; 
+        gp.npc[1].worldY = gp.tileSize * 62;
+    }
+    
+    
+ // Inside AssetSetter.java
+
+    public void setMap2Object() {
+        
+        // 1. CLEAR Map 1 objects
+        for(int i = 0; i < gp.obj.length; i++) {
+            gp.obj[i] = null;
+        }
+
+        // 2. PLACE Map 2 objects
+        // Example: A Key at Column 15, Row 20
+        gp.obj[0] = new OBJ_Card(gp);
+        gp.obj[0].worldX = 56 * gp.tileSize;
+        gp.obj[0].worldY = 35 * gp.tileSize;
+        
+        gp.obj[1] = new OBJ_Card(gp);
+        gp.obj[1].worldX = 42 * gp.tileSize;
+        gp.obj[1].worldY = 53 * gp.tileSize;
+        
+        gp.obj[2] = new OBJ_Card(gp);
+        gp.obj[2].worldX = 36 * gp.tileSize;
+        gp.obj[2].worldY = 37 * gp.tileSize;
+
+        gp.obj[3] = new OBJ_Gate(gp);
+        gp.obj[3].worldX = 48 * gp.tileSize;
+        gp.obj[3].worldY = 29 * gp.tileSize;
+        
+        gp.obj[4] = new OBJ_Gate(gp);
+        gp.obj[4].worldX = 49 * gp.tileSize;
+        gp.obj[4].worldY = 29 * gp.tileSize;
+        
+        gp.obj[5] = new OBJ_Gate(gp);
+        gp.obj[5].worldX = 49 * gp.tileSize;
+        gp.obj[5].worldY = 63 * gp.tileSize;
+        
+        gp.obj[6] = new OBJ_Gate(gp);
+        gp.obj[6].worldX = 48 * gp.tileSize;
+        gp.obj[6].worldY = 63 * gp.tileSize;
+     
     }
     
     

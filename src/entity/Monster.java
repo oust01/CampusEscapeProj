@@ -15,7 +15,7 @@ public class Monster extends Entity {
         this.gp = gp;
         
         type = 1;
-        speed = 2;
+        speed = 3;
         direction = "down";
 
         solidArea.x = 8;

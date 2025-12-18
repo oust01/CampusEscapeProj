@@ -13,6 +13,7 @@ import java.awt.Color;
 public class Entity {
 
     GamePanel gp;
+    
 
     public int worldX, worldY;
     public int speed;
@@ -42,11 +43,14 @@ public class Entity {
     };
     public String currentDialogue = "";
     public int dialogueCounter = 0;
+    
+    
+    
 
     public Entity(GamePanel gp) {
         this.gp = gp;
     }
-
+    
     public void setAction() {}
 
     public void update() {
@@ -74,21 +78,25 @@ public class Entity {
         }
 
         if (!collisionOn) {
-
             switch (direction) {
                 case "up": worldY -= speed; break;
                 case "down": worldY += speed; break;
                 case "left": worldX -= speed; break;
                 case "right": worldX += speed; break;
             }
-
         } else if (type == 1) {
-            // ===== MONSTER BOUNCE =====
-            switch (direction) {
-                case "up": direction = "down"; break;
-                case "down": direction = "up"; break;
-                case "left": direction = "right"; break;
-                case "right": direction = "left"; break;
+            // Check if this specific entity is the MonsterOrc Boss
+            if (this instanceof MonsterOrc) {
+                // BOSS LOGIC: Force immediate recalculation to find a way around the wall
+                actionLockCounter = 30; 
+            } else {
+                // REGULAR MONSTER: Keep the simple bounce logic
+                switch (direction) {
+                    case "up": direction = "down"; break;
+                    case "down": direction = "up"; break;
+                    case "left": direction = "right"; break;
+                    case "right": direction = "left"; break;
+                }
             }
         }
 
@@ -159,4 +167,23 @@ public class Entity {
     public void speak() {
         // unused
     }
+
+ // ================= TALK METHOD =================
+    public void talk() {
+        if (dialogue.length > 0) {
+            currentDialogue = dialogue[dialogueCounter]; // get current dialogue
+            gp.ui.showMessage(currentDialogue);          // display on UI
+
+            // cycle to next line
+            dialogueCounter++;
+            if (dialogueCounter >= dialogue.length) {
+                dialogueCounter = 0; // loop back to first line
+            }
+        }
+    }
+
+    
+
+		
 }
+
