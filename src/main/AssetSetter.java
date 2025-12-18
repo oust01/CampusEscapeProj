@@ -76,7 +76,7 @@ public class AssetSetter {
     public void setNPC() {
 
         // GUARD (friendly / interactive)
-       /* gp.npc[0] = new NPC_Guard(gp);
+        gp.npc[0] = new NPC_Guard(gp);
         gp.npc[0].worldX = gp.tileSize * 63;
         gp.npc[0].worldY = gp.tileSize * 51;
 
@@ -119,7 +119,7 @@ public class AssetSetter {
         
         gp.npc[10] = new Monster(gp);
         gp.npc[10].worldX = gp.tileSize * 43;
-        gp.npc[10].worldY = gp.tileSize * 45; */
+        gp.npc[10].worldY = gp.tileSize * 45; 
         
     	
         
